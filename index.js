@@ -26,11 +26,15 @@ const sqlCon = new Promise(function(resolve, reject) {
 wss.on('connection', function connection(ws) {
     ws.on('message', function incoming(message) {
         console.log( message);
+        var request = JSON.parse(message)
         sqlCon.then(function(con) {
 
-            con.request().query(JSON.parse(message)).then(function(result) {
+            con.request().query(request.query).then(function(result) {
 
-                ws.send(JSON.stringify(result.recordset));
+                ws.send(JSON.stringify({
+                    id: request.id,
+                    data: result.recordset
+                }));
             }).catch(function(err) {
                 console.log(err)
             });
